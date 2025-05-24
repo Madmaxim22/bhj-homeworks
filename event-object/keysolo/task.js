@@ -31,7 +31,7 @@ class Game {
   }
 
   registerEvents() {
-    var status = function (e) {
+    document.addEventListener("keypress", e => {
       if (
         e.key.toLowerCase() === this.currentSymbol.textContent.toLowerCase()
       ) {
@@ -39,8 +39,7 @@ class Game {
       } else {
         this.fail();
       }
-    };
-    document.addEventListener("keypress", status.bind(this), false);
+    })
   }
 
   success() {

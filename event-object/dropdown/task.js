@@ -3,7 +3,7 @@ const dropdownList = document.querySelector(".dropdown__list");
 // const dropdownLinks = document.querySelectorAll(".dropdown__link");
 
 dropdownValue.addEventListener("click", function () {
-  dropdownList.classList.add("dropdown__list_active");
+  dropdownList.classList.toggle("dropdown__list_active");
 });
 
 // dropdownLinks.forEach((link) => {
