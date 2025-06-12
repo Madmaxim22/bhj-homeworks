@@ -1,4 +1,5 @@
 const products = document.querySelectorAll(".product");
+const cart = document.querySelector(".cart");
 
 checkStorage();
 
@@ -15,6 +16,14 @@ products.forEach((product) => {
       checkCartProduct();
     }
   });
+});
+
+cart.addEventListener("click", (e) => {
+  if (e.target.classList.contains("cart__product-remove")) {
+    e.target.parentNode.remove();
+    checkCartProduct();
+    saveLacolStorage();
+  }
 });
 
 function counterDec(element) {
@@ -45,38 +54,22 @@ function checkProduct(product) {
   } else {
     createCartProduct(id, src, count);
   }
-  let obj = {
-    id: id,
-    src: src,
-    count: count,
-  };
-  let serObj = JSON.stringify(obj);
-  localStorage.setItem(id, serObj);
+  saveLacolStorage();
 }
 
 function createCartProduct(id, src, count) {
   const cartProducts = document.querySelector(".cart__products");
 
-  let cartProduct = document.createElement("div");
-  cartProduct.className = "cart__product";
-  cartProduct.id = id;
-
-  let cartProductImage = document.createElement("img");
-  cartProductImage.className = "cart__product-image";
-  cartProductImage.src = src;
-
-  let cartProductCount = document.createElement("div");
-  cartProductCount.className = "cart__product-count";
-  cartProductCount.innerText = count;
-
-  let cartProductRemove = document.createElement("div");
-  cartProductRemove.className = "cart__product-remove";
-  cartProductRemove.innerHTML = "×";
-
-  cartProduct.append(cartProductImage, cartProductCount, cartProductRemove);
-  cartProducts.append(cartProduct);
-
-  handlerRemoveCartProduct(cartProduct);
+  cartProducts.insertAdjacentHTML(
+    "beforeend",
+    `
+    <div class="cart__product" id=${id}>
+    <img class="cart__product-image" src=${src}>
+    <div class="cart__product-count">${count}</div>
+    <div class="cart__product-remove">×</div>
+    </div>
+    `
+  );
 }
 
 function changeProduct(product, count) {
@@ -84,16 +77,6 @@ function changeProduct(product, count) {
   count = Number(value.textContent) + count;
   value.innerText = count;
   return count;
-}
-
-function handlerRemoveCartProduct(cartProduct) {
-  cartProduct.addEventListener("click", (e) => {
-    if (e.target.classList.contains("cart__product-remove")) {
-      cartProduct.remove();
-      checkCartProduct();
-      localStorage.removeItem(cartProduct.id);
-    }
-  });
 }
 
 function checkCartProduct() {
@@ -135,12 +118,33 @@ function flytoCart(product, cartProduct) {
   setTimeout(() => document.body.removeChild(productImageClone), 960);
 }
 
+function saveLacolStorage() {
+  let objects = [];
+  const cartProducts = Array.from(
+    document.querySelector(".cart__products").children
+  );
+  if (cartProducts.length === 0) {
+    localStorage.clear();
+    return;
+  }
+  cartProducts.forEach((product) => {
+    let item = {
+      id: product.id,
+      src: product.querySelector(".cart__product-image").src,
+      count: product.querySelector(".cart__product-count").textContent,
+    };
+    objects.push(item);
+  });
+  localStorage.setItem("cartProducts", JSON.stringify(objects));
+}
+
 function checkStorage() {
   const cart = document.querySelector(".cart");
-  const items = { ...localStorage };
-  for (const key in items) {
-    let retObj = JSON.parse(localStorage.getItem(key));
-    createCartProduct(retObj.id, retObj.src, retObj.count);
+  const objects = JSON.parse(localStorage.getItem("cartProducts"));
+  if (objects) {
     cart.style.display = "block";
+    objects.forEach((item) => {
+      createCartProduct(item.id, item.src, item.count);
+    });
   }
 }
