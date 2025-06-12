@@ -2,6 +2,10 @@ progress {
     margin-bottom: 10px;
 }
 
+.upload__container {
+    margin-bottom: 10px;
+}
+
 form {
   position: relative;
 }
